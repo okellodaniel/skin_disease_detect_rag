@@ -1,2 +1,4 @@
-# skin_disease_detect_rag
-skin_disease_detect_rag
+# Skin Disorder Rag
+
+
+
