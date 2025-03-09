@@ -8,13 +8,13 @@ logging.basicConfig(level=logging.INFO,format='[%(ascitime)s]: %(message)s')
 
 files = [
     "src/__init__.py",
-    "src/helper.py",
+    "src/helpers.py",
     ".env",
-    "requirements.txt",
     "setup.py",
     "app.py",
-    "data",
-    "research/trials.py"
+    "/data",
+    "notebooks/notebook.ipynb",
+    "templates"
 ]
 
 

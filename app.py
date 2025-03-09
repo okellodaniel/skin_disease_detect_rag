@@ -26,14 +26,13 @@ INDEX_NAME = "testindex"
 @app.route('/')
 def index():
     logger.info("Rendering index page")
-    return render_template('index.html')
+    return render_template('chat.html')
 
 @app.route("/chat", methods=["GET", "POST"])
 def chat():
     try:
         msg = request.form["msg"]
         logger.info(f"Received chat message: {msg}")
-        rag_chain = rag()
         response = rag_chain.invoke({"input": msg})
         logger.info(f"Generated response: {response['answer']}")
         return str(response["answer"])
@@ -41,6 +40,7 @@ def chat():
         logger.error(f"Error in chat endpoint: {e}")
         return jsonify({"error": str(e)}), 500
 
+@lru_cache(maxsize=1)
 def download_embeddings():
     logger.info("Downloading Hugging Face embeddings")
     embeddings = download_hugging_face_embeddings()
@@ -78,15 +78,16 @@ def create_qa_rag_chain(retriever, llm, prompt):
     rag_chain = create_retrieval_chain(retriever, question_answer_chain)
     return rag_chain
 
-def rag():
-    logger.info("Initializing RAG pipeline")
-    embeddings = download_embeddings()
-    doc_search = initialize_vector_Store(embeddings=embeddings)
-    retriever = retriever_initializer(docsearch=doc_search)
-    llm = llm_Setup()
-    prompt = prepare_prompt(prompt_temp=prompt_template)
-    rag_chain = create_qa_rag_chain(retriever, llm, prompt)
-    return rag_chain
+
+logger.info("Initializing RAG pipeline")
+embeddings = download_embeddings()
+
+doc_search = initialize_vector_Store(embeddings=embeddings)
+retriever = retriever_initializer(docsearch=doc_search)
+llm = llm_Setup()
+prompt = prepare_prompt(prompt_temp=prompt_template)
+rag_chain = create_qa_rag_chain(retriever, llm, prompt)
+
 
 if __name__ == '__main__':
     logger.info("Starting Flask application")
